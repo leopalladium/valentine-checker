@@ -142,7 +142,7 @@ html, body {
 
 /* Состояние открытой книги */
 .book.open {
-  transform: translateX(50%) rotateY(-180deg);
+  transform: translateX(50%) rotateY(-90deg);
 }
 
 /* -- ОБЛОЖКА -- */
