@@ -213,16 +213,19 @@ const getZIndex = (pageIndex) => {
     <div v-if="showLetter" class="letter-overlay" @click.self="closeLetter">
       <div class="letter-paper">
         <button class="close-btn" @click="closeLetter">✖</button>
-        <h2>My Promise to You</h2>
+        <h2>Самой лучшей девушке в этом мире</h2>
         <p>
-          More than anything, I want you to know how much you mean to me.
-          Wait, I have more to say...
+          Больше всего хочется сказать тебе, что ты не представляешь сколько ты значишь для меня. Ты — это свет в моих днях, улыбка на моем лице и тепло в моем сердце. Я благодарен судьбе за каждый момент, который мы провели вместе.
+          Хотя, мне хочется сказать ещё кое-что...
         </p>
         <p>
-          Every day with you is a new adventure. I love your smile, your laugh,
-          and even the way you steal my hoodies. You are my person.
+          Каждый день с тобой — это приключение, и я не могу дождаться, чтобы продолжать
+          исследовать этот мир вместе.
+          Ты - моё вдохновение, моя поддержка и моя любовь.
+          Я обещаю всегда быть рядом, поддерживать тебя и любить всем сердцем.
         </p>
-        <p class="sign">With all my love,<br>Your Valentine ❤️</p>
+        <p>P.S. Помнишь, я тебе говорил, где лежит что-то маленькое, что я для тебя приготовил? Сейчас тот момент, когда стоит это взять</p>
+        <p class="sign">С любовью,<br>Навеки твой <br>Клим ❤️</p>
       </div>
     </div>
 
