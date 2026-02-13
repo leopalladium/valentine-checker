@@ -35,7 +35,7 @@ const acceptDisclaimer = () => {
 
 // --- YES/NO BUTTON LOGIC ---
 const noTexts = [
-  "Нет", "Ты уверена?", "Подумай еще!", "Не разбивай мне сердце 💔",
+  "No", "Ты уверена?", "Подумай еще!", "Не разбивай мне сердце 💔",
   "Я буду плакать...", "Ну пожалуйста?", "Ладно, я понял...", "Шутка! Жми ДА! ❤️"
 ]
 const noTextIndex = ref(0)
@@ -229,8 +229,8 @@ const getZIndex = (pageIndex) => {
     <!-- Disclaimer Overlay -->
     <div v-if="showDisclaimer" class="disclaimer-overlay">
       <div class="disclaimer-content">
-        <p>Это интерактивная история о любви. Пожалуйста, примите это к сведению.</p>
-        <button class="accept-btn" @click="acceptDisclaimer">Понял, поехали! 🚀</button>
+        <p>Кажется ты начала что-то подозревать, я добавляю это сообщение в час ночи 14 февраля, надеюсь тебе понравится.</p>
+        <button class="accept-btn" @click="acceptDisclaimer">Okay let's go</button>
       </div>
     </div>
 
@@ -243,7 +243,7 @@ const getZIndex = (pageIndex) => {
           @click="handleYes"
           :style="{ transform: `scale(${yesScale})` }"
         >
-          Да! ❤️
+          Yes! ❤️
         </button>
         <button
           class="btn no-btn"
