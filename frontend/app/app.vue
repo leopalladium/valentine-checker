@@ -17,7 +17,7 @@ const noBtnText = ref(noTexts[0])
 const yesScale = ref(1)
 const noPos = ref({ x: 0, y: 0 })
 
-coconst clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
 const handleNo = () => {
   yesScale.value *= 1.2
