@@ -686,12 +686,6 @@ html, body {
 }
 .small-p:nth-child(2) { transform: rotate(5deg); }
 
-.polaroids {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
 .polaroid {
   background: white;
   padding: 10px 10px 30px 10px;
@@ -700,7 +694,7 @@ html, body {
   transition: transform 0.3s;
 }
 .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 10; }
-.polaroid.p2 { transform: rotate(3deg); }
+
 .img-box img {
     width: 100%;
     height: auto;
@@ -878,28 +872,45 @@ html, body {
   50% { transform: translateY(-5px); }
 }
 
-/* Mobile adjustments */
+/* --- MOBILE RESPONSIVENESS (АДАПТИВНОСТЬ) --- */
 @media (max-width: 768px) {
+  /* Adjust book size to fit mobile screen width */
   .book-container {
-    width: 45vw; /* Spread will be 90vw */
+    width: 45vw; /* Spread will be 90vw (leaving 5vw margins) */
     height: 60vh;
   }
 
+  /* Center the spine when book opens */
   .book-container.shifted {
     transform: translateX(50%);
   }
 
-  .main-title { font-size: 1.8rem; }
-  .btn { padding: 10px 20px; font-size: 1.2rem; }
+  /* Adjust title size and spacing for mobile */
+  .main-title {
+    font-size: 1.8rem;
+    margin-bottom: 30vh; /* Slightly reduced gap on mobile to ensure buttons stay visible */
+  }
 
-  /* Responsive Content */
-  .cover-text { font-size: 1.5rem; } /* Reduced from 1.8rem */
+  /* Larger buttons for touch targets */
+  .btn {
+    padding: 10px 20px;
+    font-size: 1.2rem;
+  }
+
+  /* Resize heart on cover */
   .heart-shape { font-size: 2.5rem; }
 
+  /* Adjust letter overlay padding */
   .letter-paper { padding: 20px; font-size: 1.2rem; }
+
+  /* Stack buttons nicely if space is tight */
+  .buttons-container {
+    gap: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
+  /* Smaller mobile devices layout tweaks */
   .book-container { height: 55vh; }
   .main-title { font-size: 1.5rem; }
 }
