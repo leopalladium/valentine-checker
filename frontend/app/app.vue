@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import confetti from 'canvas-confetti'
 
 const accepted = ref(false)
@@ -243,7 +243,9 @@ const getZIndex = (pageIndex) => {
                 Я обещаю быть твоей поддержкой, твоей радостью
                 и тем, кто будет рядом и всегда приносит шоколадки. 🍫
               </p>
-              <div class="nav-hint" @click="nextPage">Далее ➡️</div>
+              <div class="nav-actions">
+                <button class="small-btn" @click="nextPage">Далее ➡️</button>
+              </div>
             </div>
           </div>
           <div class="back">
@@ -447,9 +449,10 @@ html, body {
   color: #fff;
   font-family: 'Dancing Script', cursive;
   font-size: 2.5rem; /* Reduced from 4rem */
-  margin-bottom: 2rem;
+  margin-bottom: 35vh;
   text-shadow: 0 4px 10px rgba(216, 27, 96, 0.5);
   text-align: center;
+  pointer-events: none; /* Let clicks pass through if overlapping (though margin keeps it away) */
 }
 
 .buttons-container {
@@ -558,12 +561,7 @@ html, body {
   color: white;
   width: 100%;
 }
-.cover-text {
-  display: block;
-  font-family: 'Dancing Script', cursive;
-  font-size: 2rem; /* Reduced from 2.5rem */
-  line-height: 1.2;
-}
+
 .heart-shape {
   font-size: 3rem; /* Reduced from 4rem */
   margin: 15px 0;
