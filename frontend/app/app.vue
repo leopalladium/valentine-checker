@@ -3,8 +3,8 @@ import { ref, watch } from 'vue'
 import confetti from 'canvas-confetti'
 
 const accepted = ref(false)
-const currentPage = ref(0) // 0 = Cover, 1 = Intro, 2 = Gallery, 3 = Game
-const totalPages = 3
+const currentPage = ref(0) // 0 = Cover, 1 = Intro, 2 = Gallery, 3 = Quiz, 4 = Letter
+const totalPages = 4
 
 // --- TIMELINE DATA ---
 const timelineEvents = [
@@ -16,6 +16,16 @@ const timelineEvents = [
 const activeEventIndex = ref(0)
 const selectEvent = (index) => {
   activeEventIndex.value = index
+}
+
+// --- LETTER OVERLAY ---
+const showLetter = ref(false)
+const closeLetter = () => {
+  showLetter.value = false
+}
+const openLetter = () => {
+  showLetter.value = true
+  launchConfetti()
 }
 
 // --- YES/NO BUTTON LOGIC ---
@@ -99,70 +109,51 @@ const prevPage = () => {
   if (currentPage.value > 0) currentPage.value--
 }
 
-// --- MINI GAME: MATCH PAIRS ---
-const gameStarted = ref(false)
-const cards = ref([])
-const flippedCards = ref([])
-const matchedPairs = ref(0)
-const gameWon = ref(false)
+// --- QUIZ LOGIC ---
+const quizStarted = ref(false)
+const currentQuestion = ref(0)
+const quizScore = ref(0)
+const quizCompleted = ref(false)
 
-const emojis = ['💝', '🌹', '🧸', '🍫', '✨', '🎀']
+const questions = [
+  {
+    q: "Where was our first date?",
+    options: ["Cinema", "Park", "Cafe", "Moon"],
+    correct: 1 // Index of correct answer
+  },
+  {
+    q: "What is my favorite food?",
+    options: ["Pizza", "Sushi", "Burgers", "You"],
+    correct: 1
+  },
+  {
+    q: "Who said 'I love you' first?",
+    options: ["Me", "You", "Both at once", "My cat"],
+    correct: 0
+  }
+]
 
-const initGame = () => {
-  gameStarted.value = true
-  matchedPairs.value = 0
-  gameWon.value = false
-  flippedCards.value = []
+const handleAnswer = (index) => {
+  if (index === questions[currentQuestion.value].correct) {
+    quizScore.value++
+  }
 
-  // Create pairs
-  cards.value = [...emojis, ...emojis]
-      .sort(() => Math.random() - 0.5)
-      .map((emoji, index) => ({
-        id: index,
-        emoji,
-        isFlipped: false,
-        isMatched: false
-      }))
-}
-
-const handleCardClick = (card) => {
-  if (card.isFlipped || card.isMatched || flippedCards.value.length >= 2) return
-
-  card.isFlipped = true
-  flippedCards.value.push(card)
-
-  if (flippedCards.value.length === 2) {
-    const [c1, c2] = flippedCards.value
-    if (c1.emoji === c2.emoji) {
-      // Match!
-      c1.isMatched = true
-      c2.isMatched = true
-      matchedPairs.value++
-      flippedCards.value = []
-      if (matchedPairs.value === emojis.length) {
-        setTimeout(() => {
-            gameWon.value = true
-            launchConfetti()
-        }, 500)
-      }
-    } else {
-      // No match
-      setTimeout(() => {
-        c1.isFlipped = false
-        c2.isFlipped = false
-        flippedCards.value = []
-      }, 1000)
-    }
+  if (currentQuestion.value < questions.length - 1) {
+    currentQuestion.value++
+  } else {
+    quizCompleted.value = true
+    launchConfetti()
   }
 }
 
-// Init game when page 3 is opened
-watch(currentPage, (val) => {
-  if (val === 3 && !gameStarted.value) {
-    initGame()
-  }
-})
+const restartQuiz = () => {
+  quizStarted.value = true
+  currentQuestion.value = 0
+  quizScore.value = 0
+  quizCompleted.value = false
+}
 
+// --- Z-INDEX LOGIC ---
 const getZIndex = (pageIndex) => {
   // If page is flipped (current page > page index), it goes to the left stack.
   // Left stack: higher index = higher z-index (on top).
@@ -173,6 +164,23 @@ const getZIndex = (pageIndex) => {
 
 <template>
   <div class="scene">
+    <!-- Letter Overlay -->
+    <div v-if="showLetter" class="letter-overlay" @click.self="closeLetter">
+      <div class="letter-paper">
+        <button class="close-btn" @click="closeLetter">✖</button>
+        <h2>My Promise to You</h2>
+        <p>
+          More than anything, I want you to know how much you mean to me.
+          Wait, I have more to say...
+        </p>
+        <p>
+          Every day with you is a new adventure. I love your smile, your laugh,
+          and even the way you steal my hoodies. You are my person.
+        </p>
+        <p class="sign">With all my love,<br>Your Valentine ❤️</p>
+      </div>
+    </div>
+
     <!-- Floating Decisions Layer -->
     <div class="decision-overlay" :class="{ 'fade-out': accepted }">
       <h1 class="main-title" v-if="!accepted">Will you be my Valentine?</h1>
@@ -292,47 +300,100 @@ const getZIndex = (pageIndex) => {
                 </p>
                 <div class="nav-actions">
                   <button class="small-btn" @click="prevPage">⬅️ Back</button>
-                  <button class="small-btn" @click="nextPage">Game ➡️</button>
+                  <button class="small-btn" @click="nextPage">Quiz ➡️</button>
                 </div>
              </div>
           </div>
           <div class="back">
             <!-- Back of Page 2 (Left side of spread 3) -->
-            <div class="content game-intro">
-               <h3>Love Match!</h3>
-               <p>Найди все пары, чтобы выиграть мое сердце ❤️</p>
-               <div class="score">Pairs found: {{ matchedPairs }} / 6</div>
-               <button class="small-btn" v-if="gameWon" @click="initGame">Play Again 🔄</button>
+            <div class="content quiz-intro">
+               <h3>Couple Quiz! 🧠</h3>
+               <p>How well do you know us?</p>
+               <p v-if="!quizStarted">Answer correct to match our vibe!</p>
+
+               <div v-if="!quizStarted" class="start-quiz-box">
+                 <button class="small-btn" @click="restartQuiz">Start Quiz ▶️</button>
+               </div>
+
+               <button class="small-btn" v-if="quizCompleted" @click="nextPage">See Prize ➡️</button>
             </div>
           </div>
         </div>
 
-        <!-- PAGE 3: GAME -->
+        <!-- PAGE 3: QUIZ -->
         <div
           class="page page-3"
-          style="z-index: 7;"
+          :class="{ 'flipped': currentPage > 3 }"
+          :style="{ zIndex: getZIndex(3) }"
         >
           <div class="front">
-             <div class="content game-board">
-                <div class="grid" :class="{ 'winner': gameWon }">
-                  <div
-                    v-for="card in cards"
-                    :key="card.id"
-                    class="card-container"
-                    @click="handleCardClick(card)"
-                  >
-                    <div class="card" :class="{ 'is-flipped': card.isFlipped || card.isMatched }">
-                      <div class="card-front">❓</div>
-                      <div class="card-back">{{ card.emoji }}</div>
-                    </div>
+             <div class="content quiz-board">
+                <div v-if="quizStarted && !quizCompleted" class="question-container">
+                  <h4>Question {{ currentQuestion + 1 }}/{{ questions.length }}</h4>
+                  <p class="q-text">{{ questions[currentQuestion].q }}</p>
+                  <div class="options">
+                    <button
+                      v-for="(opt, idx) in questions[currentQuestion].options"
+                      :key="idx"
+                      class="option-btn"
+                      @click="handleAnswer(idx)"
+                    >
+                      {{ opt }}
+                    </button>
                   </div>
+                </div>
+
+                <div v-else-if="quizCompleted" class="quiz-result">
+                  <h3>Quiz Done! 🎉</h3>
+                  <p>You scored {{ quizScore }} / {{ questions.length }}</p>
+                  <p v-if="quizScore === questions.length">Perfect Match! ❤️</p>
+                  <p v-else>Good enough for me! 😘</p>
+                  <div class="nav-actions">
+                     <button class="small-btn" @click="restartQuiz">Retry 🔄</button>
+                     <button class="small-btn" @click="nextPage">My Note ➡️</button>
+                  </div>
+                </div>
+
+                <div v-else class="waiting-state">
+                   <p>Click "Start Quiz" on the left page!</p>
+                </div>
+
+                <div class="nav-actions bottom" v-if="!quizCompleted">
+                    <button class="small-btn" @click="prevPage">⬅️ Back</button>
+                </div>
+             </div>
+          </div>
+          <div class="back">
+             <!-- Back of Page 3 (Left side of spread 4) - Final decor -->
+             <div class="content final-decor">
+               <h3>Just for you...</h3>
+               <div class="decor-heart">💌</div>
+             </div>
+          </div>
+        </div>
+
+        <!-- PAGE 4: LETTER -->
+        <div
+          class="page page-4"
+          style="z-index: 6;"
+        >
+          <div class="front">
+             <div class="content letter-page">
+                <h3>Read Me</h3>
+                <div class="envelope-container" @click="openLetter">
+                   <div class="envelope">
+                     <div class="envelope-flap"></div>
+                     <div class="envelope-pocket"></div>
+                     <div class="envelope-letter"></div>
+                   </div>
+                   <span class="click-hint">Click to open 👆</span>
                 </div>
                 <div class="nav-actions bottom">
                   <button class="small-btn" @click="prevPage">⬅️ Back</button>
                 </div>
              </div>
           </div>
-          <div class="back"></div> <!-- Last page back is empty/cover back -->
+          <div class="back"></div>
         </div>
 
       </div>
@@ -386,7 +447,7 @@ html, body {
 .main-title {
   color: #fff;
   font-family: 'Dancing Script', cursive;
-  font-size: 4rem;
+  font-size: 2.5rem; /* Reduced from 4rem */
   margin-bottom: 2rem;
   text-shadow: 0 4px 10px rgba(216, 27, 96, 0.5);
   text-align: center;
@@ -497,11 +558,11 @@ html, body {
 .cover-text {
   display: block;
   font-family: 'Dancing Script', cursive;
-  font-size: 2.5rem; /* Reduced from 3rem */
+  font-size: 2rem; /* Reduced from 2.5rem */
   line-height: 1.2;
 }
 .heart-shape {
-  font-size: 4rem; /* Reduced from 5rem */
+  font-size: 3rem; /* Reduced from 4rem */
   margin: 15px 0;
   animation: pulse 2s infinite;
 }
@@ -672,64 +733,148 @@ html, body {
   gap: 10px;
 }
 
-/* --- GAME --- */
-.game-board {
-  padding: 15px;
-  justify-content: flex-start;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  width: 100%;
-  margin-top: 20px;
-}
-.card-container {
-  aspect-ratio: 3/4;
-  perspective: 100px;
-}
-.card {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  border-radius: 8px;
-}
-.card.is-flipped {
-  transform: rotateY(180deg);
-}
-.card-front, .card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  align-items: center;
+/* --- QUIZ STYLES */
+.quiz-board {
   justify-content: center;
-  font-size: 2rem;
-  border-radius: 8px;
 }
-.card-front {
-  background: #ffecb3;
-  color: #ff6f00;
+.question-container {
+  width: 100%;
 }
-.card-back {
+.q-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 15px 0;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.option-btn {
   background: white;
-  transform: rotateY(180deg);
-  border: 2px solid #ffecb3;
+  border: 1px solid #d81b60;
+  padding: 10px;
+  border-radius: 8px;
+  color: #c2185b;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
 }
-.winner .card-back {
-  background: #d4edda;
-  border-color: #c3e6cb;
+.option-btn:hover {
+  background: #fce4ec;
+  transform: translateX(5px);
+}
+
+/* ENVELOPE STYLES */
+.envelope-container {
+  cursor: pointer;
+  margin-top: 30px;
+  transition: transform 0.3s;
+}
+.envelope-container:hover {
+  transform: scale(1.1);
+}
+.envelope {
+  width: 120px;
+  height: 80px;
+  background: #ef5350;
+  position: relative;
+  display: inline-block;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-top: 40px solid #e53935;
+  transform-origin: top;
+  z-index: 2;
+}
+.envelope-pocket {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 60px solid #e57373;
+  border-right: 60px solid #ef9a9a;
+  border-bottom: 40px solid #ef5350;
+  border-top: 40px solid transparent;
+  z-index: 1;
+}
+.click-hint {
+  display: block;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #880e4f;
+  animation: bounce 1s infinite;
+}
+
+/* LETTER OVERLAY */
+.letter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.8);
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  padding: 20px;
+}
+.letter-paper {
+  background: #fffbf0;
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  border-radius: 5px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  position: relative;
+  text-align: left;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: #4e342e;
+  transform: rotate(-1deg);
+}
+.letter-paper h2 {
+  text-align: center;
+  margin-top: 0;
+  color: #d81b60;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #aaa;
+}
+.sign {
+  margin-top: 30px;
+  text-align: right;
+  font-weight: bold;
 }
 
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 /* Mobile adjustments */
@@ -743,33 +888,19 @@ html, body {
     transform: translateX(50%);
   }
 
-  .main-title { font-size: 2rem; }
+  .main-title { font-size: 1.8rem; }
   .btn { padding: 10px 20px; font-size: 1.2rem; }
 
   /* Responsive Content */
-  .cover-text { font-size: 1.8rem; }
-  .heart-shape { font-size: 3rem; }
+  .cover-text { font-size: 1.5rem; } /* Reduced from 1.8rem */
+  .heart-shape { font-size: 2.5rem; }
 
-  .text-page h2 { font-size: 1.8rem; margin-bottom: 10px; }
-  .text-page p { font-size: 0.9rem; line-height: 1.3; margin-bottom: 10px; }
-
-  .polaroids { gap: 15px; margin-top: 10px; }
-  .polaroid { padding: 5px 5px 15px 5px; }
-
-  .photo-page-2 .big-photo img { max-height: 120px; }
-  .love-note { font-size: 1rem; }
-
-  /* Game Mobile */
-  .game-board { padding: 5px; }
-  .grid { gap: 5px; margin-top: 10px; }
-  .card-container { aspect-ratio: 1; perspective: 80px; }
-  .card-front, .card-back { font-size: 1.5rem; border-width: 1px; }
-
-  .buttons-container { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+  .letter-paper { padding: 20px; font-size: 1.2rem; }
 }
 
 @media (max-width: 480px) {
   .book-container { height: 55vh; }
-  .main-title { font-size: 1.8rem; }
+  .main-title { font-size: 1.5rem; }
 }
 </style>
+
