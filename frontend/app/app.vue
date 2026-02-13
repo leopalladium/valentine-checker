@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import confetti from 'canvas-confetti'
 
+const showDisclaimer = ref(true) // Disclaimer state
 const accepted = ref(false)
 const currentPage = ref(0) // 0 = Cover, 1 = Intro, 2 = Gallery, 3 = Quiz, 4 = Letter
 const totalPages = 4
@@ -26,6 +27,10 @@ const closeLetter = () => {
 const openLetter = () => {
   showLetter.value = true
   launchConfetti()
+}
+
+const acceptDisclaimer = () => {
+  showDisclaimer.value = false
 }
 
 // --- YES/NO BUTTON LOGIC ---
@@ -177,6 +182,17 @@ const handleSwipe = () => {
   }
 }
 
+// Reactivate animations when page changes
+const pageAnimStates = ref([true, false, false, false, false]) // Cover + 4 pages
+watch(currentPage, (val) => {
+   // Reset others
+   pageAnimStates.value = pageAnimStates.value.map(() => false)
+   // trigger animation for new page after flip duration
+   setTimeout(() => {
+     pageAnimStates.value[val] = true
+   }, 600) // Halfway through flip
+})
+
 // --- Z-INDEX LOGIC ---
 const getZIndex = (pageIndex) => {
   // If page is flipped (current page > page index), it goes to the left stack.
@@ -207,6 +223,14 @@ const getZIndex = (pageIndex) => {
           and even the way you steal my hoodies. You are my person.
         </p>
         <p class="sign">With all my love,<br>Your Valentine ❤️</p>
+      </div>
+    </div>
+
+    <!-- Disclaimer Overlay -->
+    <div v-if="showDisclaimer" class="disclaimer-overlay">
+      <div class="disclaimer-content">
+        <p>Это интерактивная история о любви. Пожалуйста, примите это к сведению.</p>
+        <button class="accept-btn" @click="acceptDisclaimer">Понял, поехали! 🚀</button>
       </div>
     </div>
 
@@ -261,7 +285,7 @@ const getZIndex = (pageIndex) => {
           :style="{ zIndex: getZIndex(1) }"
         >
           <div class="front">
-            <div class="content text-page">
+            <div class="content text-page" :class="{ 'animate-in': pageAnimStates[1] }">
               <h2>Дорогая Аня,</h2>
               <p>
                 Я так долго ждал момента, чтобы сказать тебе это.
@@ -278,7 +302,7 @@ const getZIndex = (pageIndex) => {
           </div>
           <div class="back">
             <!-- Back of Page 1 (Left side of spread 2) - TIMELINE -->
-             <div class="content timeline-page">
+             <div class="content timeline-page" :class="{ 'animate-in': pageAnimStates[2] }">
                <h3>Our Timeline ⏳</h3>
                <div class="timeline">
                  <div
@@ -308,7 +332,7 @@ const getZIndex = (pageIndex) => {
         >
           <div class="front">
             <!-- Front of Page 2 (Right side of spread 2) - GALLERY -->
-             <div class="content photo-page-2">
+             <div class="content photo-page-2" :class="{ 'animate-in': pageAnimStates[2] }">
                 <div class="photo-grid">
                   <div class="polaroid small-p">
                     <div class="img-box">
@@ -331,7 +355,7 @@ const getZIndex = (pageIndex) => {
           </div>
           <div class="back">
             <!-- Back of Page 2 (Left side of spread 3) -->
-            <div class="content quiz-intro">
+            <div class="content quiz-intro" :class="{ 'animate-in': pageAnimStates[3] }">
                <h3>Couple Quiz! 🧠</h3>
                <p>How well do you know us?</p>
                <p v-if="!quizStarted">Answer correct to match our vibe!</p>
@@ -352,7 +376,7 @@ const getZIndex = (pageIndex) => {
           :style="{ zIndex: getZIndex(3) }"
         >
           <div class="front">
-             <div class="content quiz-board">
+             <div class="content quiz-board" :class="{ 'animate-in': pageAnimStates[3] }">
                 <div v-if="quizStarted && !quizCompleted" class="question-container">
                   <h4>Question {{ currentQuestion + 1 }}/{{ questions.length }}</h4>
                   <p class="q-text">{{ questions[currentQuestion].q }}</p>
@@ -386,7 +410,7 @@ const getZIndex = (pageIndex) => {
           </div>
           <div class="back">
              <!-- Back of Page 3 (Left side of spread 4) - Final decor -->
-             <div class="content final-decor">
+             <div class="content final-decor" :class="{ 'animate-in': pageAnimStates[4] }">
                <h3>Just for you...</h3>
                <div class="decor-heart">💌</div>
                <p>Open the envelope on the right...</p>
@@ -400,7 +424,7 @@ const getZIndex = (pageIndex) => {
           style="z-index: 6;"
         >
           <div class="front">
-             <div class="content pocket-container" @click="openLetter">
+             <div class="content pocket-container" @click="openLetter" :class="{ 'animate-in': pageAnimStates[4] }">
                 <div class="letter-peek">
                    <div class="letter-text">For You...</div>
                 </div>
@@ -763,20 +787,25 @@ html, body {
 }
 
 .small-btn {
-  background: none;
-  border: 1px solid #d81b60;
+  background: transparent;
+  border: 2px solid #d81b60; /* Thicker border */
   color: #d81b60;
-  padding: 5px 15px;
-  border-radius: 20px;
+  padding: 8px 18px;
+  border-radius: 25px; /* Match nav-btn radius */
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 15px;
   font-family: 'Nunito', sans-serif;
+  font-weight: 700; /* Bold text */
   transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(216, 27, 96, 0.1);
 }
 .small-btn:hover {
   background: #d81b60;
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(216, 27, 96, 0.3);
 }
+
 .nav-actions {
   margin-top: auto;
   display: flex;
@@ -815,57 +844,7 @@ html, body {
   transform: translateX(5px);
 }
 
-/* ENVELOPE STYLES */
-.envelope-container {
-  cursor: pointer;
-  margin-top: 30px;
-  transition: transform 0.3s;
-}
-.envelope-container:hover {
-  transform: scale(1.1);
-}
-.envelope {
-  width: 120px;
-  height: 80px;
-  background: #ef5350;
-  position: relative;
-  display: inline-block;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-.envelope-flap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-left: 60px solid transparent;
-  border-right: 60px solid transparent;
-  border-top: 40px solid #e53935;
-  transform-origin: top;
-  z-index: 2;
-}
-.envelope-pocket {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-left: 60px solid #e57373;
-  border-right: 60px solid #ef9a9a;
-  border-bottom: 40px solid #ef5350;
-  border-top: 40px solid transparent;
-  z-index: 1;
-}
-.click-hint {
-  display: block;
-  margin-top: 15px;
-  font-size: 0.9rem;
-  color: #880e4f;
-  animation: bounce 1s infinite;
-}
-
-/* LETTER OVERLAY */
+/* --- ANIMATIONS (Standardized) --- */
 .letter-overlay {
   position: fixed;
   top: 0;
@@ -914,6 +893,95 @@ html, body {
   margin-top: 30px;
   text-align: right;
   font-weight: bold;
+}
+
+/* DISCLAIMER STYLES */
+.disclaimer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 6000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+.disclaimer-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.accept-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #d81b60;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.3s;
+}
+.accept-btn:hover {
+  background: #c2185b;
+}
+
+/* --- ANIMATIONS (Standardized) --- */
+/* Default hidden state for content elements */
+.content h2,
+.content h3,
+.content p,
+.content .timeline,
+.content .photo-grid,
+.content .quiz-board > div,
+.content .pocket-container > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Active state when page is turned */
+.animate-in h2,
+.animate-in h3 { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.animate-in p { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.animate-in .timeline,
+.animate-in .photo-grid { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.animate-in .quiz-board > div { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.animate-in .pocket-container > * { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+
+/* Timeline Item Interaction */
+.timeline-item {
+  transition: transform 0.2s;
+}
+.timeline-item:hover {
+  transform: scale(1.1);
+}
+
+/* Button Standardization */
+.small-btn {
+  background: transparent;
+  border: 2px solid #d81b60; /* Thicker border */
+  color: #d81b60;
+  padding: 8px 18px;
+  border-radius: 25px; /* Match nav-btn radius */
+  cursor: pointer;
+  margin-top: 15px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; /* Bold text */
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(216, 27, 96, 0.1);
+}
+.small-btn:hover {
+  background: #d81b60;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(216, 27, 96, 0.3);
 }
 
 @keyframes pulse {
@@ -1098,7 +1166,7 @@ html, body {
      display: block;
   }
 
-  .quiz-board .nav-actions.bottom {
+  .quiz-board .nav-actions {
     display: none; /* Hide "Back" on quiz page, use swipe */
   }
 
