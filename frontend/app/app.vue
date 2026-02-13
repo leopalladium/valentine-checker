@@ -9,10 +9,10 @@ const totalPages = 4
 
 // --- TIMELINE DATA ---
 const timelineEvents = [
-  { date: 'First Hello', title: 'Start of Us', desc: 'The day our worlds collided.' },
-  { date: '14 Feb', title: 'First Valentine', desc: 'Simple, sweet, and unforgettable.' },
-  { date: 'Summer', title: 'Adventures', desc: 'Sunsets, road trips, and laughter.' },
-  { date: 'Today', title: 'Forever', desc: 'Writing our next chapter...' }
+  { date: 'Первый привет', title: '27 июня 2025', desc: 'День, когда мы встретились с тобой.' },
+  { date: 'Наше лето', title: 'Мы ещё не знали', desc: 'Помнишь как мы говорили, что не хотим отношений? Я тоже помню, до сих пор смешно.' },
+  { date: '13 октября ', title: 'Теперь мы встречаемся', desc: 'Мы прошли через многое и решили стать парой.' },
+  { date: 'Сегодня', title: 'Вместе и навсегда', desc: 'Представь, четыре месяца и один день как пара. Давай мы вместе напишем следующую главу...' }
 ]
 const activeEventIndex = ref(0)
 const selectEvent = (index) => {
