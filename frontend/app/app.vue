@@ -215,7 +215,6 @@ const getZIndex = (pageIndex) => {
         >
           <div class="front">
             <div class="cover-design">
-              <span class="cover-text">Our Story</span>
               <div class="heart-shape">❤️</div>
               <span class="tap-hint">Нажми, чтобы открыть</span>
             </div>
@@ -234,15 +233,15 @@ const getZIndex = (pageIndex) => {
         >
           <div class="front">
             <div class="content text-page">
-              <h2>My Dearest,</h2>
+              <h2>Дорогая Аня,</h2>
               <p>
                 Я так долго ждал момента, чтобы сказать тебе это.
                 Ты наполнила мою жизнь светом и теплом.
-                Каждый момент с тобой — это магия.
+                Каждый момент с тобой — это настоящее чудо.
               </p>
               <p>
                 Я обещаю быть твоей поддержкой, твоей радостью
-                и тем, кто всегда приносит шоколадки. 🍫
+                и тем, кто будет рядом и всегда приносит шоколадки. 🍫
               </p>
               <div class="nav-hint" @click="nextPage">Далее ➡️</div>
             </div>
@@ -473,6 +472,8 @@ html, body {
   background: #d81b60;
   color: white;
   box-shadow: 0 10px 20px rgba(216, 27, 96, 0.4);
+  z-index: 10;
+  position: relative;
 }
 
 .yes-btn:hover {
@@ -484,6 +485,8 @@ html, body {
   background: #fff;
   color: #333;
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  z-index: 1;
+  position: relative;
 }
 
 /* --- BOOK 3D --- */
