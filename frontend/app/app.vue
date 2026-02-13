@@ -876,8 +876,10 @@ html, body {
 @media (max-width: 768px) {
   /* Adjust book size to fit mobile screen width */
   .book-container {
-    width: 45vw; /* Spread will be 90vw (leaving 5vw margins) */
-    height: 60vh;
+    width: 44vw; /* Slightly narrower to ensure margins */
+    height: auto; /* Allow aspect-ratio to dictate height */
+    aspect-ratio: 2 / 3; /* Maintain a realistic book page ratio (width/height) */
+    max-height: 70vh; /* Prevent overflowing screen height */
   }
 
   /* Center the spine when book opens */
@@ -906,6 +908,47 @@ html, body {
   /* Stack buttons nicely if space is tight */
   .buttons-container {
     gap: 1.5rem;
+  }
+
+  /* --- FIXES FOR MOBILE CONTENT --- */
+
+  /* Ensure scrolling works smoothly on touch devices */
+  .content {
+    -webkit-overflow-scrolling: touch;
+    padding: 10px; /* More space for content */
+  }
+
+  /* Prevent buttons from being squashed or pushed out */
+  .nav-actions {
+    flex-shrink: 0;
+    margin-top: auto;
+    margin-bottom: 20px; /* Ensure safe distance from bottom edge */
+    z-index: 20; /* Ensure clickable */
+    position: relative;
+  }
+
+  /* Adjust Photo Grid to be more flexible */
+  .photo-grid {
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .big-photo img {
+    max-height: 100px; /* Limit height to save space */
+  }
+
+  .polaroid {
+    padding: 5px;
+  }
+
+  .img-box img {
+    max-width: 100%;
+  }
+
+  /* Allow text to scroll if needed */
+  .text-page p {
+    font-size: 0.85rem;
+    line-height: 1.3;
   }
 }
 
