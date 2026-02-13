@@ -394,22 +394,20 @@ const getZIndex = (pageIndex) => {
           </div>
         </div>
 
-        <!-- PAGE 4: LETTER (Redesigned as Page Envelope) -->
+        <!-- PAGE 4: LETTER (Redesigned as Moleskine Pocket) -->
         <div
           class="page page-4"
           style="z-index: 6;"
         >
           <div class="front">
-             <div class="content envelope-page-content" @click="openLetter">
-                <div class="page-pocket">
-                  <div class="pocket-front">
-                     <span class="wax-seal">❤️</span>
-                  </div>
-                  <div class="paper-peek">
-                    Dear Valentine...
-                  </div>
+             <div class="content pocket-container" @click="openLetter">
+                <div class="letter-peek">
+                   <div class="letter-text">For You...</div>
                 </div>
-                <span class="click-hint">Tap to Read Letter</span>
+                <div class="moleskine-pocket">
+                   <span class="pocket-decor">Files of My Heart 📂</span>
+                </div>
+                <span class="click-hint">Tap pocket to open</span>
              </div>
           </div>
           <div class="back"></div>
@@ -967,61 +965,63 @@ html, body {
   font-family: 'Nunito', sans-serif;
 }
 
-/* Page Envelope Design */
-.envelope-page-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #f8bbd0; /* Envelope color */
-  border: 10px solid #f48fb1;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+/* Page Pocket Design (Moleskine Style) */
+.pocket-container {
+  width: 100%;
+  height: 100%;
   position: relative;
-}
-.page-pocket {
-  position: relative;
-  width: 200px;
-  height: 250px;
+  /* Page background is already inherited, but we make sure content aligns bottom */
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  cursor: pointer;
+  overflow: hidden; /* IMPORTANT: Clip letter inside page */
+  padding-bottom: 0 !important; /* Override generic padding */
 }
-.pocket-front {
+
+.moleskine-pocket {
+  width: 90%;
+  height: 40%;
+  background: #d7ccc8; /* Beige/Cardboard color */
+  border-top: 1px solid #a1887f;
+  border-radius: 5px 5px 0 0;
   position: absolute;
   bottom: 0;
-  width: 100%;
-  height: 60%;
-  background: #ec407a;
-  border-radius: 0 0 10px 10px;
-  z-index: 2;
+  z-index: 20;
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
 }
-.paper-peek {
-  width: 90%;
-  height: 90%;
-  background: white;
-  border-radius: 5px;
-  padding: 10px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
-  z-index: 1;
-  transform: translateY(-20px);
-  transition: transform 0.3s;
+.pocket-decor {
   font-family: 'Dancing Script', cursive;
+  color: #5d4037;
   font-size: 1.2rem;
-  color: #880e4f;
-  text-align: center;
+  opacity: 0.8;
 }
-.page-pocket:hover .paper-peek {
-  transform: translateY(-50px);
+
+.letter-peek {
+  width: 85%;
+  height: 50%; /* Taller than pocket so it peeks out */
+  background: #fff;
+  border: 1px solid #efebe9;
+  position: absolute;
+  bottom: 10px; /* Start inside pocket */
+  z-index: 10;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  padding-top: 15px;
 }
-.wax-seal {
-  font-size: 2.5rem;
-  color: #880e4f;
-  text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+.letter-text {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.5rem;
+  color: #d81b60;
+}
+
+/* Hover Effect for Desktop */
+.pocket-container:hover .letter-peek {
+  transform: translateY(-40px);
 }
 
 /* Mobile Hints */
@@ -1043,12 +1043,11 @@ html, body {
     display: block; /* Show hint to swipe */
   }
 
-  /* Adjust book size to fit mobile screen width */
+  /* Adjust book size to fit mobile screen width using vmin for consistent ratio */
   .book-container {
-    width: 44vw; /* Slightly narrower to ensure margins */
-    height: auto; /* Allow aspect-ratio to dictate height */
-    aspect-ratio: 2 / 3; /* Maintain a realistic book page ratio (width/height) */
-    max-height: 70vh; /* Prevent overflowing screen height */
+    width: 43vmin; /* Keeps spread at 86vmin, safe for both portrait/landscape */
+    height: 62vmin; /* Aspect ratio ~1.44 */
+    /* Override pixel sizes */
   }
 
   /* Center the spine when book opens */
@@ -1134,7 +1133,11 @@ html, body {
 
 @media (max-width: 480px) {
   /* Smaller mobile devices layout tweaks */
-  .book-container { height: 55vh; }
+  .book-container {
+      /* Even safer on super small screens */
+      width: 42vmin;
+      height: 60vmin;
+  }
   .main-title { font-size: 1.5rem; }
 }
 </style>
