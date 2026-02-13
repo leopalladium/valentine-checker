@@ -153,6 +153,30 @@ const restartQuiz = () => {
   quizCompleted.value = false
 }
 
+// --- SWIPE SUPPORT ---
+const touchStartX = ref(0)
+const touchEndX = ref(0)
+
+const handleTouchStart = (e) => {
+  touchStartX.value = e.changedTouches[0].screenX
+}
+
+const handleTouchEnd = (e) => {
+  touchEndX.value = e.changedTouches[0].screenX
+  handleSwipe()
+}
+
+const handleSwipe = () => {
+  if (!accepted.value) return // Don't swipe if not accepted yet
+  const threshold = 50
+  if (touchEndX.value < touchStartX.value - threshold) {
+    nextPage()
+  }
+  if (touchEndX.value > touchStartX.value + threshold) {
+    prevPage()
+  }
+}
+
 // --- Z-INDEX LOGIC ---
 const getZIndex = (pageIndex) => {
   // If page is flipped (current page > page index), it goes to the left stack.
@@ -163,7 +187,12 @@ const getZIndex = (pageIndex) => {
 </script>
 
 <template>
-  <div class="scene">
+  <div class="scene" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
+    <!-- Background Particles (CSS only simple decorative elements) -->
+    <div class="bg-hearts">
+      <div class="bg-heart" v-for="n in 10" :key="n" :style="{ left: Math.random()*100 + '%', animationDelay: Math.random()*5 + 's' }">❤️</div>
+    </div>
+
     <!-- Letter Overlay -->
     <div v-if="showLetter" class="letter-overlay" @click.self="closeLetter">
       <div class="letter-paper">
@@ -243,9 +272,8 @@ const getZIndex = (pageIndex) => {
                 Я обещаю быть твоей поддержкой, твоей радостью
                 и тем, кто будет рядом и всегда приносит шоколадки. 🍫
               </p>
-              <div class="nav-actions">
-                <button class="small-btn" @click="nextPage">Далее ➡️</button>
-              </div>
+              <!-- Internal Nav Removed for Cleaner Look on Desktop, Swipe/Click works -->
+              <div class="mobile-hint">Swipe to turn ➡️</div>
             </div>
           </div>
           <div class="back">
@@ -299,10 +327,6 @@ const getZIndex = (pageIndex) => {
                 <p class="love-note">
                   "Collection of our happiest moments."
                 </p>
-                <div class="nav-actions">
-                  <button class="small-btn" @click="prevPage">⬅️ Back</button>
-                  <button class="small-btn" @click="nextPage">Quiz ➡️</button>
-                </div>
              </div>
           </div>
           <div class="back">
@@ -316,7 +340,7 @@ const getZIndex = (pageIndex) => {
                  <button class="small-btn" @click="restartQuiz">Start Quiz ▶️</button>
                </div>
 
-               <button class="small-btn" v-if="quizCompleted" @click="nextPage">See Prize ➡️</button>
+               <div class="score" v-if="quizCompleted">All done! 🏆</div>
             </div>
           </div>
         </div>
@@ -358,10 +382,6 @@ const getZIndex = (pageIndex) => {
                 <div v-else class="waiting-state">
                    <p>Click "Start Quiz" on the left page!</p>
                 </div>
-
-                <div class="nav-actions bottom" v-if="!quizCompleted">
-                    <button class="small-btn" @click="prevPage">⬅️ Back</button>
-                </div>
              </div>
           </div>
           <div class="back">
@@ -369,29 +389,27 @@ const getZIndex = (pageIndex) => {
              <div class="content final-decor">
                <h3>Just for you...</h3>
                <div class="decor-heart">💌</div>
+               <p>Open the envelope on the right...</p>
              </div>
           </div>
         </div>
 
-        <!-- PAGE 4: LETTER -->
+        <!-- PAGE 4: LETTER (Redesigned as Page Envelope) -->
         <div
           class="page page-4"
           style="z-index: 6;"
         >
           <div class="front">
-             <div class="content letter-page">
-                <h3>Read Me</h3>
-                <div class="envelope-container" @click="openLetter">
-                   <div class="envelope">
-                     <div class="envelope-flap"></div>
-                     <div class="envelope-pocket"></div>
-                     <div class="envelope-letter"></div>
-                   </div>
-                   <span class="click-hint">Click to open 👆</span>
+             <div class="content envelope-page-content" @click="openLetter">
+                <div class="page-pocket">
+                  <div class="pocket-front">
+                     <span class="wax-seal">❤️</span>
+                  </div>
+                  <div class="paper-peek">
+                    Dear Valentine...
+                  </div>
                 </div>
-                <div class="nav-actions bottom">
-                  <button class="small-btn" @click="prevPage">⬅️ Back</button>
-                </div>
+                <span class="click-hint">Tap to Read Letter</span>
              </div>
           </div>
           <div class="back"></div>
@@ -399,6 +417,14 @@ const getZIndex = (pageIndex) => {
 
       </div>
     </div>
+
+    <!-- PC Navigation Controls (Under the book) -->
+    <div class="pc-controls" v-if="accepted">
+      <button class="nav-btn" @click="prevPage" :disabled="currentPage === 0">❮ Prev</button>
+      <span class="page-indicator">{{ currentPage }} / {{ totalPages }}</span>
+      <button class="nav-btn" @click="nextPage" :disabled="currentPage === totalPages">Next ❯</button>
+    </div>
+
   </div>
 </template>
 
@@ -410,7 +436,7 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: #201e21; /* Dark elegant background */
+  background: #201e21;
   font-family: 'Nunito', sans-serif;
   overflow: hidden;
 }
@@ -419,10 +445,41 @@ html, body {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column; /* Stack controls below book on PC */
   justify-content: center;
   align-items: center;
   perspective: 1500px;
-  background-image: radial-gradient(circle at center, #3a2e3a 0%, #1a151a 100%);
+  /* Better Background */
+  background: linear-gradient(135deg, #2b1022 0%, #4a192c 50%, #1a0b18 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating BG Hearts */
+.bg-hearts {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.bg-heart {
+  position: absolute;
+  bottom: -50px;
+  font-size: 2rem;
+  opacity: 0.1;
+  animation: floatUp 10s infinite linear;
+  color: #d81b60;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.2; }
+  90% { opacity: 0.2; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
 }
 
 /* --- DECISION LAYER --- */
@@ -872,8 +929,120 @@ html, body {
   50% { transform: translateY(-5px); }
 }
 
+/* PC Controls */
+.pc-controls {
+  margin-top: 40px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  z-index: 100;
+  background: rgba(0,0,0,0.3);
+  padding: 10px 20px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+}
+.nav-btn {
+  background: transparent;
+  border: 2px solid #ff80ab;
+  color: #ff80ab;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) {
+  background: #ff80ab;
+  color: white;
+}
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: #555;
+  color: #555;
+}
+.page-indicator {
+  color: rgba(255,255,255,0.7);
+  font-family: 'Nunito', sans-serif;
+}
+
+/* Page Envelope Design */
+.envelope-page-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f8bbd0; /* Envelope color */
+  border: 10px solid #f48fb1;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+  position: relative;
+}
+.page-pocket {
+  position: relative;
+  width: 200px;
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  cursor: pointer;
+}
+.pocket-front {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60%;
+  background: #ec407a;
+  border-radius: 0 0 10px 10px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+.paper-peek {
+  width: 90%;
+  height: 90%;
+  background: white;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  z-index: 1;
+  transform: translateY(-20px);
+  transition: transform 0.3s;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.2rem;
+  color: #880e4f;
+  text-align: center;
+}
+.page-pocket:hover .paper-peek {
+  transform: translateY(-50px);
+}
+.wax-seal {
+  font-size: 2.5rem;
+  color: #880e4f;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+}
+
+/* Mobile Hints */
+.mobile-hint {
+  display: none;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin-top: 10px;
+  color: #d81b60;
+}
+
 /* --- MOBILE RESPONSIVENESS (АДАПТИВНОСТЬ) --- */
 @media (max-width: 768px) {
+  .pc-controls {
+    display: none; /* Hide PC controls on mobile */
+  }
+
+  .mobile-hint {
+    display: block; /* Show hint to swipe */
+  }
+
   /* Adjust book size to fit mobile screen width */
   .book-container {
     width: 44vw; /* Slightly narrower to ensure margins */
@@ -920,11 +1089,22 @@ html, body {
 
   /* Prevent buttons from being squashed or pushed out */
   .nav-actions {
-    flex-shrink: 0;
-    margin-top: auto;
-    margin-bottom: 20px; /* Ensure safe distance from bottom edge */
-    z-index: 20; /* Ensure clickable */
-    position: relative;
+     /* Hide internal nav actions on mobile if we have swipe,
+        but maybe keep for Quiz/Game specifics */
+     display: none;
+  }
+
+  /* Quiz/etc buttons that we WANT to keep */
+  .quiz-intro .start-quiz-box, .quiz-result .nav-actions, .quiz-intro button {
+     display: block;
+  }
+
+  .quiz-board .nav-actions.bottom {
+    display: none; /* Hide "Back" on quiz page, use swipe */
+  }
+
+  .letter-page .nav-actions {
+    display: none;
   }
 
   /* Adjust Photo Grid to be more flexible */
