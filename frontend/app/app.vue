@@ -184,7 +184,7 @@ const getZIndex = (pageIndex) => {
     </div>
 
     <!-- The 3D Book -->
-    <div class="book-container">
+    <div class="book-container" :class="{ 'shifted': currentPage > 0 }">
       <div class="book" :class="{ 'book-open': currentPage > 0 }">
 
         <!-- COVER -->
@@ -407,11 +407,14 @@ html, body {
   width: 400px; /* Single page width */
   height: 550px;
   position: relative;
-  /* Shift whole container left when open to center the spread */
-  transition: transform 1s ease-in-out;
+  /* Shift whole container right when open to center the spread */
+  transition: transform 1s ease-in-out, width 0.5s, height 0.5s;
 }
-/* When book is open (page > 0), we can shift container if we want,
-   but simplistic approach: Keep it centered, it opens to right. */
+
+.book-container.shifted {
+  /* Shift right by 50% of width so the spine is at center */
+  transform: translateX(50%);
+}
 
 .book {
   width: 100%;
@@ -484,7 +487,7 @@ html, body {
 }
 
 .content {
-  padding: 30px;
+  padding: 20px;
   height: 100%;
   box-sizing: border-box;
   display: flex;
@@ -492,6 +495,11 @@ html, body {
   align-items: center;
   text-align: center;
   color: #4e342e;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.content::-webkit-scrollbar {
+  display: none;
 }
 
 .text-page h2 {
@@ -616,12 +624,43 @@ html, body {
 }
 
 /* Mobile adjustments */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .book-container {
-    width: 90vw;
-    height: 70vh;
+    width: 45vw; /* Spread will be 90vw */
+    height: 60vh;
   }
-  .main-title { font-size: 2.5rem; }
+
+  .book-container.shifted {
+    transform: translateX(50%);
+  }
+
+  .main-title { font-size: 2rem; }
   .btn { padding: 10px 20px; font-size: 1.2rem; }
+
+  /* Responsive Content */
+  .cover-text { font-size: 2rem; }
+  .heart-shape { font-size: 3.5rem; }
+
+  .text-page h2 { font-size: 1.8rem; margin-bottom: 10px; }
+  .text-page p { font-size: 0.9rem; line-height: 1.3; margin-bottom: 10px; }
+
+  .polaroids { gap: 15px; margin-top: 10px; }
+  .polaroid { padding: 5px 5px 15px 5px; }
+
+  .photo-page-2 .big-photo img { max-height: 120px; }
+  .love-note { font-size: 1rem; }
+
+  /* Game Mobile */
+  .game-board { padding: 5px; }
+  .grid { gap: 5px; margin-top: 10px; }
+  .card-container { aspect-ratio: 1; perspective: 80px; }
+  .card-front, .card-back { font-size: 1.5rem; border-width: 1px; }
+
+  .buttons-container { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .book-container { height: 55vh; }
+  .main-title { font-size: 1.8rem; }
 }
 </style>
