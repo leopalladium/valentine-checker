@@ -6,6 +6,7 @@ const accepted = ref(false)
 const currentPage = ref(0) // 0 = Cover, 1 = Intro, 2 = Gallery, 3 = Game
 const totalPages = 3
 
+
 // --- YES/NO BUTTON LOGIC ---
 const noTexts = [
   "Нет", "Ты уверена?", "Подумай еще!", "Не разбивай мне сердце 💔",
