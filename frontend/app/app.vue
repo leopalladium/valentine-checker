@@ -6,6 +6,17 @@ const accepted = ref(false)
 const currentPage = ref(0) // 0 = Cover, 1 = Intro, 2 = Gallery, 3 = Game
 const totalPages = 3
 
+// --- TIMELINE DATA ---
+const timelineEvents = [
+  { date: 'First Hello', title: 'Start of Us', desc: 'The day our worlds collided.' },
+  { date: '14 Feb', title: 'First Valentine', desc: 'Simple, sweet, and unforgettable.' },
+  { date: 'Summer', title: 'Adventures', desc: 'Sunsets, road trips, and laughter.' },
+  { date: 'Today', title: 'Forever', desc: 'Writing our next chapter...' }
+]
+const activeEventIndex = ref(0)
+const selectEvent = (index) => {
+  activeEventIndex.value = index
+}
 
 // --- YES/NO BUTTON LOGIC ---
 const noTexts = [
@@ -229,23 +240,24 @@ const getZIndex = (pageIndex) => {
             </div>
           </div>
           <div class="back">
-            <!-- Back of Page 1 (Left side of spread 2) -->
-             <div class="content photo-page">
-               <h3>Memories ✨</h3>
-               <div class="polaroids">
-                 <div class="polaroid p1">
-                   <div class="img-box">
-                      <!-- Placeholders -->
-                      <img src="https://placehold.co/150x150/ffced9/d81b60?text=Photo+1" alt="Us">
-                   </div>
-                   <span>First Date</span>
+            <!-- Back of Page 1 (Left side of spread 2) - TIMELINE -->
+             <div class="content timeline-page">
+               <h3>Our Timeline ⏳</h3>
+               <div class="timeline">
+                 <div
+                   v-for="(event, index) in timelineEvents"
+                   :key="index"
+                   class="timeline-item"
+                   :class="{ 'active': activeEventIndex === index }"
+                   @click="selectEvent(index)"
+                 >
+                   <div class="point"></div>
+                   <div class="date-label">{{ event.date }}</div>
                  </div>
-                 <div class="polaroid p2">
-                    <div class="img-box">
-                      <img src="https://placehold.co/150x150/ffced9/d81b60?text=Photo+2" alt="Us">
-                    </div>
-                   <span>Silly Fits</span>
-                 </div>
+               </div>
+               <div class="event-details">
+                 <h4>{{ timelineEvents[activeEventIndex].title }}</h4>
+                 <p>{{ timelineEvents[activeEventIndex].desc }}</p>
                </div>
              </div>
           </div>
@@ -258,14 +270,25 @@ const getZIndex = (pageIndex) => {
           :style="{ zIndex: getZIndex(2) }"
         >
           <div class="front">
-            <!-- Front of Page 2 (Right side of spread 2) -->
+            <!-- Front of Page 2 (Right side of spread 2) - GALLERY -->
              <div class="content photo-page-2">
-                <div class="big-photo">
-                   <img src="https://placehold.co/250x200/ffced9/d81b60?text=Couple+Goal" alt="Big Photo">
-                   <span>Best Travel 🌍</span>
+                <div class="photo-grid">
+                  <div class="polaroid small-p">
+                    <div class="img-box">
+                      <img src="https://placehold.co/100x100/ffced9/d81b60?text=Us" alt="Pic">
+                    </div>
+                  </div>
+                  <div class="polaroid small-p">
+                    <div class="img-box">
+                      <img src="https://placehold.co/100x100/ffced9/d81b60?text=Cute" alt="Pic">
+                    </div>
+                  </div>
+                   <div class="big-photo">
+                      <img src="https://placehold.co/200x150/ffced9/d81b60?text=Travel" alt="Big Photo">
+                   </div>
                 </div>
                 <p class="love-note">
-                  "В тебе я нашел всё, что искал."
+                  "Collection of our happiest moments."
                 </p>
                 <div class="nav-actions">
                   <button class="small-btn" @click="prevPage">⬅️ Back</button>
@@ -464,19 +487,22 @@ html, body {
   align-items: center;
   justify-content: center;
   border: 2px solid #4a148c;
+  padding: 10px; /* Added padding to prevent overflow */
 }
 .cover-design {
   text-align: center;
   color: white;
+  width: 100%;
 }
 .cover-text {
   display: block;
   font-family: 'Dancing Script', cursive;
-  font-size: 3rem;
+  font-size: 2.5rem; /* Reduced from 3rem */
+  line-height: 1.2;
 }
 .heart-shape {
-  font-size: 5rem;
-  margin: 20px 0;
+  font-size: 4rem; /* Reduced from 5rem */
+  margin: 15px 0;
   animation: pulse 2s infinite;
 }
 .tap-hint {
@@ -514,6 +540,89 @@ html, body {
   margin-bottom: 20px;
   text-align: justify;
 }
+
+/* Timeline Styles */
+.timeline-page {
+  display: flex;
+  flex-direction: column;
+}
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  width: 100%;
+  position: relative;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px; /* Align with dots */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #ff80ab;
+  z-index: 0;
+}
+.timeline-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+}
+.point {
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border: 3px solid #d81b60;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+.date-label {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-weight: bold;
+  opacity: 0.7;
+}
+.timeline-item.active .point {
+  background: #d81b60;
+  transform: scale(1.3);
+}
+.timeline-item.active .date-label {
+  color: #d81b60;
+  opacity: 1;
+}
+.event-details {
+  background: #fff0f6;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+  border: 1px dashed #d81b60;
+  min-height: 100px;
+  transition: all 0.3s ease;
+}
+.event-details h4 {
+  margin: 0 0 10px 0;
+  color: #c2185b;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.5rem;
+}
+
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.small-p {
+  width: 80px;
+  padding: 5px 5px 20px 5px;
+  transform: rotate(-5deg);
+}
+.small-p:nth-child(2) { transform: rotate(5deg); }
 
 .polaroids {
   margin-top: 20px;
@@ -638,8 +747,8 @@ html, body {
   .btn { padding: 10px 20px; font-size: 1.2rem; }
 
   /* Responsive Content */
-  .cover-text { font-size: 2rem; }
-  .heart-shape { font-size: 3.5rem; }
+  .cover-text { font-size: 1.8rem; }
+  .heart-shape { font-size: 3rem; }
 
   .text-page h2 { font-size: 1.8rem; margin-bottom: 10px; }
   .text-page p { font-size: 0.9rem; line-height: 1.3; margin-bottom: 10px; }
