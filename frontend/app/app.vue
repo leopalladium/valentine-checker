@@ -419,9 +419,9 @@ const getZIndex = (pageIndex) => {
           <div class="back">
              <!-- Back of Page 3 (Left side of spread 4) - Final decor -->
              <div class="content final-decor" :class="{ 'animate-in': pageAnimStates[4] }">
-               <h3>Just for you...</h3>
+               <h3>Только для тебя...</h3>
                <div class="decor-heart">💌</div>
-               <p>Open the envelope on the right...</p>
+               <p>Открой письмо, оно справа...</p>
              </div>
           </div>
         </div>
@@ -434,12 +434,12 @@ const getZIndex = (pageIndex) => {
           <div class="front">
              <div class="content pocket-container" @click="openLetter" :class="{ 'animate-in': pageAnimStates[4] }">
                 <div class="letter-peek">
-                   <div class="letter-text">For You...</div>
+                   <div class="letter-text">Самой лучшей девушке...</div>
                 </div>
                 <div class="moleskine-pocket">
-                   <span class="pocket-decor">Files of My Heart 📂</span>
+                   <span class="pocket-decor">Важные штуки 📂</span>
                 </div>
-                <span class="click-hint">Tap pocket to open</span>
+                <span class="click-hint">Нажми, чтобы открыть</span>
              </div>
           </div>
           <div class="back"></div>
