@@ -122,19 +122,19 @@ const quizCompleted = ref(false)
 
 const questions = [
   {
-    q: "Where was our first date?",
-    options: ["Cinema", "Park", "Cafe", "Moon"],
-    correct: 1 // Index of correct answer
+    q: "Когда мы познакомились?",
+    options: ["27 июня", "12 июля", "27 июля", "23 мая"],
+    correct: 0 // Index of correct answer
   },
   {
-    q: "What is my favorite food?",
-    options: ["Pizza", "Sushi", "Burgers", "You"],
-    correct: 1
+    q: "Какое моё любимое блюдо?",
+    options: ["Пицца", "Šťouchané brambory", "Лапша", "Ты"],
+    correct: 3
   },
   {
-    q: "Who said 'I love you' first?",
-    options: ["Me", "You", "Both at once", "My cat"],
-    correct: 0
+    q: "Кто первый признался в своих чувствах?",
+    options: ["Я", "Ты", "Одновременно", "Никто не признавался"],
+    correct: [0, 2, 3]
   }
 ]
 
@@ -359,15 +359,15 @@ const getZIndex = (pageIndex) => {
           <div class="back">
             <!-- Back of Page 2 (Left side of spread 3) -->
             <div class="content quiz-intro" :class="{ 'animate-in': pageAnimStates[3] }">
-               <h3>Couple Quiz! 🧠</h3>
-               <p>How well do you know us?</p>
-               <p v-if="!quizStarted">Answer correct to match our vibe!</p>
+               <h3>Парный квиз! 🧠</h3>
+               <p>Как хорошо ты знаешь нас?</p>
+               <p v-if="!quizStarted">Отвечай и не подглядывай!</p>
 
                <div v-if="!quizStarted" class="start-quiz-box">
-                 <button class="small-btn" @click="restartQuiz">Start Quiz ▶️</button>
+                 <button class="small-btn" @click="restartQuiz">Начать квиз ▶️</button>
                </div>
 
-               <div class="score" v-if="quizCompleted">All done! 🏆</div>
+               <div class="score" v-if="quizCompleted">Умничка! 🏆</div>
             </div>
           </div>
         </div>
@@ -397,12 +397,12 @@ const getZIndex = (pageIndex) => {
 
                 <div v-else-if="quizCompleted" class="quiz-result">
                   <h3>Quiz Done! 🎉</h3>
-                  <p>You scored {{ quizScore }} / {{ questions.length }}</p>
-                  <p v-if="quizScore === questions.length">Perfect Match! ❤️</p>
-                  <p v-else>Good enough for me! 😘</p>
+                  <p>Результат {{ quizScore }} / {{ questions.length }}</p>
+                  <p v-if="quizScore === questions.length">Идеально! ❤️</p>
+                  <p v-else>Ты хорошо справилась! 😘</p>
                   <div class="nav-actions">
-                     <button class="small-btn" @click="restartQuiz">Retry 🔄</button>
-                     <button class="small-btn" @click="nextPage">My Note ➡️</button>
+                     <button class="small-btn" @click="restartQuiz">Ещё раз 🔄</button>
+                     <button class="small-btn" @click="nextPage">Дальше ➡️</button>
                   </div>
                 </div>
 
