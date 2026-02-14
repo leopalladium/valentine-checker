@@ -866,6 +866,8 @@ html, body {
   background: #fffbf0;
   width: 100%;
   max-width: 500px;
+  max-height: 80vh; /* Limit height to 80% of viewport */
+  overflow-y: auto; /* Enable vertical scrolling */
   padding: 40px;
   border-radius: 5px;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
@@ -876,6 +878,18 @@ html, body {
   line-height: 1.6;
   color: #4e342e;
   transform: rotate(-1deg);
+}
+/* Custom scrollbar for letter */
+.letter-paper::-webkit-scrollbar {
+  width: 8px;
+}
+.letter-paper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+.letter-paper::-webkit-scrollbar-thumb {
+  background: #d81b60;
+  border-radius: 4px;
 }
 .letter-paper h2 {
   text-align: center;
