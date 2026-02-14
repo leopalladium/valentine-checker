@@ -2,6 +2,14 @@
 import { ref, watch } from 'vue'
 import confetti from 'canvas-confetti'
 
+// Set page title and favicon
+useHead({
+  title: 'Be My Valentine? ❤️',
+  link: [
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+  ]
+})
+
 const showDisclaimer = ref(true) // Disclaimer state
 const accepted = ref(false)
 const currentPage = ref(0) // 0 = Cover, 1 = Intro, 2 = Gallery, 3 = Quiz, 4 = Letter
