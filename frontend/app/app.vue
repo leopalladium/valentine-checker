@@ -344,20 +344,20 @@ const getZIndex = (pageIndex) => {
                 <div class="photo-grid">
                   <div class="polaroid small-p">
                     <div class="img-box">
-                      <img src="https://placehold.co/100x100/ffced9/d81b60?text=Us" alt="Pic">
+                      <img src="/images/us.jpg" alt="Pic">
                     </div>
                   </div>
                   <div class="polaroid small-p">
                     <div class="img-box">
-                      <img src="https://placehold.co/100x100/ffced9/d81b60?text=Cute" alt="Pic">
+                      <img src="/public/images/cute.jpg" alt="Pic">
                     </div>
                   </div>
                    <div class="big-photo">
-                      <img src="https://placehold.co/200x150/ffced9/d81b60?text=Travel" alt="Big Photo">
+                      <img src="/public/images/photo.jpg" alt="Big Photo">
                    </div>
                 </div>
                 <p class="love-note">
-                  "Collection of our happiest moments."
+                  "Пара фоток хи-хи"
                 </p>
              </div>
           </div>
