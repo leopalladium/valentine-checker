@@ -139,7 +139,12 @@ const questions = [
 ]
 
 const handleAnswer = (index) => {
-  if (index === questions[currentQuestion.value].correct) {
+  const question = questions[currentQuestion.value]
+  const isCorrect = Array.isArray(question.correct)
+      ? question.correct.includes(index)
+      : index === question.correct
+
+  if (isCorrect) {
     quizScore.value++
   }
 
