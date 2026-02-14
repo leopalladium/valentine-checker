@@ -412,7 +412,7 @@ const getZIndex = (pageIndex) => {
                 </div>
 
                 <div v-else class="waiting-state">
-                   <p>Click "Start Quiz" on the left page!</p>
+                   <p>Тыкни "Начать квиз" на странице слева!</p>
                 </div>
              </div>
           </div>
