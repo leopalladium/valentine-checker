@@ -349,11 +349,11 @@ const getZIndex = (pageIndex) => {
                   </div>
                   <div class="polaroid small-p">
                     <div class="img-box">
-                      <img src="/public/images/cute.jpg" alt="Pic">
+                      <img src="/images/cute.jpg" alt="Pic">
                     </div>
                   </div>
                    <div class="big-photo">
-                      <img src="/public/images/photo.jpg" alt="Big Photo">
+                      <img src="/images/photo.jpg" alt="Big Photo">
                    </div>
                 </div>
                 <p class="love-note">
@@ -1218,6 +1218,69 @@ html, body {
   .text-page p {
     font-size: 0.85rem;
     line-height: 1.3;
+  }
+
+  /* --- VERTICAL FLIP FOR MOBILE PORTRAIT --- */
+  /* This transforms the book into a vertical "calendar/notepad" style
+     flip book to maximize use of screen space on portrait devices */
+
+  .book-container {
+      width: 85vw; /* Much wider */
+      height: 40vh; /* Taller page height */
+      /* No need for vmin on mobile portrait mostly */
+  }
+
+  /* Shift vertical instead of horizontal */
+  .book-container.shifted {
+      transform: translateY(50%) translateX(0);
+  }
+
+  /* Change hinge to Top */
+  .page {
+      transform-origin: top center;
+      border-radius: 5px 5px 15px 15px; /* Spine top, rounded bottom */
+  }
+
+  .page.flipped {
+      transform: rotateX(180deg) rotateY(0deg); /* Explicitly reset Y */
+  }
+
+  /* Back face adjustments */
+  .back {
+      transform: rotateX(180deg);
+      border-radius: 5px 5px 15px 15px;
+      box-shadow: inset 0 -5px 10px rgba(0,0,0,0.05); /* Top shadow */
+  }
+
+  /* Cover needs specific override if needed, but generic page covers it */
+  .cover .front {
+    border-width: 2px;
+  }
+
+  /* Timeline adjustments for vertical layout */
+  .timeline {
+      margin: 5px 0;
+  }
+  .event-details {
+      min-height: 60px; /* Reduced min-height */
+      padding: 10px;
+  }
+
+  /* Photo grid adjustments */
+  .photo-grid {
+      gap: 5px;
+  }
+  .polaroid {
+      padding: 5px 5px 15px 5px;
+  }
+  .big-photo img {
+     max-height: 120px;
+  }
+
+  /* Letter adjustments */
+  .letter-paper {
+     max-height: 70vh;
+     padding: 20px;
   }
 }
 
