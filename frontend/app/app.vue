@@ -782,6 +782,24 @@ html, body {
 }
 .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 10; }
 
+/* Fix for Big Photo overflow */
+.big-photo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.big-photo img {
+  max-width: 90%;
+  max-height: 180px; /* Reasonable limit for desktop */
+  height: auto;
+  border: 5px solid white;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  transform: rotate(3deg);
+  display: block;
+}
+
 .img-box img {
     width: 100%;
     height: auto;
